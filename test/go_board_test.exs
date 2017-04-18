@@ -346,6 +346,13 @@ defmodule GoBoardTest do
     assert is_in_error?(Board.pass board, :black)
   end
   
+  test "reset the game" do
+    initial_board = Board.new(%{size: 3})
+    {:ok, board} = Board.add_move initial_board, {{1, 1}, :black}
+    {:ok, board} = Board.reset board
+    assert initial_board == board
+  end
+  
   # Most functions returns are tuple of form {:ok, t} | {:error, reason}
   # This helper help to check if a response is an error, 
   # without caring about reason

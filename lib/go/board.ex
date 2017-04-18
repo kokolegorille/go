@@ -164,6 +164,15 @@ defmodule Go.Board do
     end
   end
   
+  @doc ~S"""
+  Reset. Not in original godash!
+  """
+  @spec reset(t) :: {:ok, t}
+  def reset(board) do 
+    new_board = Board.new(%{size: board.size})
+    {:ok, new_board}
+  end
+  
   ## PLACEMENTS (should happen before add_move or pass!)
   
   @doc ~S"""
