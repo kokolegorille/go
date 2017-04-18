@@ -60,22 +60,10 @@ defmodule Go.Board do
   @doc ~S"""
   Add move to a board. 
   
-  ## Examples : Testing superko
-      iex> alias Go.Board
-      iex> board = Board.new
-      iex> {:ok, board} = Board.add_move board, {{2, 3}, :black}
-      iex> {:ok, board} = Board.add_move board, {{4, 2}, :white}
-      iex> {:ok, board} = Board.add_move board, {{3, 2}, :black}
-      iex> {:ok, board} = Board.add_move board, {{5,3}, :white}
-      iex> {:ok, board} = Board.add_move board, {{3, 4}, :black}
-      iex> {:ok, board} = Board.add_move board, {{4,4}, :white}
-      iex> {:ok, board} = Board.add_move board, {{4, 3}, :black}
-      iex> {:ok, board} = Board.add_move board, {{3, 3}, :white}
-      iex> Board.add_move board, {{4, 3}, :black}
-      {:error, "superko."}
-      
+  Note: do not use string, but String.t in spec!
+  https://hexdocs.pm/elixir/typespecs.html#notes
   """
-  @spec add_move(t, move) :: {:ok, t} | {:error, binary}
+  @spec add_move(t, move) :: {:ok, t} | {:error, String.t}
   def add_move(board, {coordinate, color} = move) do
     legal_move = is_legal_move(board, move)
     
@@ -103,7 +91,6 @@ defmodule Go.Board do
         |> Enum.reduce(new_coordinates, fn(c, acc) -> Map.put(acc, c, :empty) end)
         
         # Checking for superko needs to keep track of history
-        
         lookup_table = board.history |> Enum.map(fn h -> h.fengo end)
         if is_superko(new_coordinates, opposite_color(board.next_turn), lookup_table) do
           {:error, "superko."}
@@ -125,16 +112,8 @@ defmodule Go.Board do
   
   @doc ~S"""
   Pass move. Not in original godash!
-  
-  ## Examples
-      iex> alias Go.Board
-      iex> board = Board.new
-      iex> {status, _} = Board.pass board, :black
-      iex> status == :ok
-      true
-      
   """
-  @spec pass(t, color) :: {:ok, t} | {:error, binary}
+  @spec pass(t, color) :: {:ok, t} | {:error, String.t}
   def pass(board, color) do 
     case color == board.next_turn do 
       true -> 
@@ -153,10 +132,12 @@ defmodule Go.Board do
     end
   end
   
+  ## PLACEMENTS (should happen before add_move or pass!)
+  
   @doc ~S"""
   Place one stone on the board.
   """
-  @spec place_stone(t, coordinate, color, boolean) :: {:ok, t} | {:error, binary}
+  @spec place_stone(t, coordinate, color, boolean) :: {:ok, t} | {:error, String.t}
   def place_stone(board, coordinate, color, force \\ false) do
     current_color = board.coordinates[coordinate]
     
@@ -174,13 +155,13 @@ defmodule Go.Board do
   # @doc ~S"""
   # Place multiple stones on the board.
   # """
-  @spec place_stones(t, list_of_coordinates, color) :: {:ok, t}
-  def place_stones(board, [], _color) do
-    {:ok, board}
-  end 
+  @spec place_stones(t, list_of_coordinates, color) :: {:ok, t} | {:error, String.t}
+  def place_stones(board, [], _color), do: {:ok, board}
   def place_stones(board, [coordinate | tail], color) do
-    {:ok, new_board} = place_stone(board, coordinate, color)
-    place_stones(new_board, tail, color)
+    case place_stone(board, coordinate, color) do
+      {:ok, new_board} -> place_stones(new_board, tail, color)
+      {:error, reason} -> {:error, reason}
+    end
   end
   
   @doc ~S"""
@@ -208,18 +189,11 @@ defmodule Go.Board do
     remove_stones(new_board, tail)
   end
   
+  ## END OF PLACEMENTS
+  
   @doc ~S"""
-  Like pass move, but does not change history state
-  
+  Like pass move, but does not change history state.  
   Not in original godash!
-  
-  ## Examples
-      iex> alias Go.Board
-      iex> board = Board.new
-      iex> {:ok, board} = Board.toggle_turn board
-      iex> board.next_turn
-      :white
-      
   """
   @spec toggle_turn(t) :: {:ok, t}
   def toggle_turn(board) do
