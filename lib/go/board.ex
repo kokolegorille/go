@@ -25,14 +25,20 @@ defmodule Go.Board do
     size: integer, coordinates: map, next_turn: color, 
     black_captures: integer, white_captures: integer, komi: float,
     history: list,
-    placements: list
+    placements: list,
+    consecutive_passes: integer,
+    is_over: boolean,
+    winner: color | :none
   }
   
   defstruct [
     size: 19, coordinates: %{}, next_turn: :black,
     black_captures: 0, white_captures: 0, komi: 7.5,
     history: [],
-    placements: []
+    placements: [],
+    consecutive_passes: 0,
+    is_over: false,
+    winner: :none
   ]
   
   @doc ~S"""
@@ -69,6 +75,7 @@ defmodule Go.Board do
     
     cond do
       color != board.next_turn -> {:error, "not your turn."}
+      board.is_over -> {:error, "game is over."}
       ! legal_move -> {:error, "illegal move."}
       legal_move -> 
         # Add move
@@ -103,7 +110,8 @@ defmodule Go.Board do
             coordinates: new_coordinates,
             next_turn: opposite_color(board.next_turn),
             history: new_history,
-            placements: []
+            placements: [], 
+            consecutive_passes: 0
           }
           {:ok, new_board}
         end
@@ -115,20 +123,44 @@ defmodule Go.Board do
   """
   @spec pass(t, color) :: {:ok, t} | {:error, String.t}
   def pass(board, color) do 
-    case color == board.next_turn do 
-      true -> 
+    cond do 
+      board.is_over -> {:error, "game is over."}
+      color == board.next_turn -> 
         # Add to history
         history_item = build_history_item(board, [{:pass, color} | board.placements])
         new_history = [history_item | board.history]
         
+        consecutive_passes = board.consecutive_passes + 1
+        is_over = consecutive_passes >= 2
+        
+        # TODO: if is_over -> calculate winner
+        
         new_board = %Board{board | 
           next_turn: opposite_color(board.next_turn),
           history: new_history,
-          placements: []
+          placements: [],
+          consecutive_passes: consecutive_passes,
+          is_over: is_over
         }
         {:ok, new_board}
         
-      false -> {:error, "not your turn."}
+      true -> {:error, "not your turn."}
+    end
+  end
+  
+  @doc ~S"""
+  Resign. Not in original godash!
+  """
+  @spec resign(t, color) :: {:ok, t}
+  def resign(board, color) do 
+    cond do 
+      board.is_over -> {:error, "game is over."}
+      true -> 
+        new_board = %Board{board | 
+          winner: opposite_color(color),
+          is_over: true
+        }
+        {:ok, new_board}
     end
   end
   

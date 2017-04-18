@@ -186,8 +186,7 @@ defmodule GoBoardTest do
   test "throws if adding same move twice" do
     board = Board.new
     {:ok, board} = Board.add_move board, {{9, 9}, :black}
-    {:error, reason} = Board.add_move board, {{9, 9}, :white}
-    assert reason == "illegal move."
+    assert is_in_error?(Board.add_move board, {{9, 9}, :white})
   end
   
   test "kills groups that run out of liberties" do
@@ -249,8 +248,7 @@ defmodule GoBoardTest do
   test "throws if placing onto a coordinate with an opposite stone color" do
     coordinate = {9, 9}
     {:ok, board} = Board.place_stone Board.new, coordinate, :black
-    {:error, reason} = Board.place_stone board, coordinate, :white
-    assert reason == "there is already a stone, pass force=true to override."
+    assert is_in_error?(Board.place_stone board, coordinate, :white)
   end
 
   test "can force an existing opposite color stone placement" do
@@ -288,7 +286,7 @@ defmodule GoBoardTest do
     {:ok, board} = Board.add_move board, {{4,4}, :white}
     {:ok, board} = Board.add_move board, {{4, 3}, :black}
     {:ok, board} = Board.add_move board, {{3, 3}, :white}
-    assert Board.add_move(board, {{4, 3}, :black}) == {:error, "superko."}
+    assert is_in_error?(Board.add_move(board, {{4, 3}, :black}))
   end
   
   # Describe To Ascii Board
@@ -302,5 +300,56 @@ defmodule GoBoardTest do
     board = Board.new(%{size: 3})
     {:ok, board} = Board.add_move board, {{1, 1}, :black}
     assert Board.to_ascii_board(board) == "+++\n+O+\n+++\n"
+  end
+  
+  # Describe Game Over
+  
+  test "new board is not over" do
+    board = Board.new()
+    assert ! board.is_over
+  end
+  
+  test "double pass end the game" do
+    board = Board.new(%{size: 3})
+    {:ok, board} = Board.pass board, :black
+    {:ok, board} = Board.pass board, :white
+    assert board.is_over
+  end
+  
+  test "adding a move reset passes counter" do
+    board = Board.new(%{size: 3})
+    {:ok, board} = Board.pass board, :black
+    {:ok, board} = Board.add_move board, {{1, 1}, :white}
+    {:ok, board} = Board.pass board, :black
+    assert ! board.is_over
+    assert board.consecutive_passes == 1
+  end
+  
+  test "resign end the game" do
+    board = Board.new(%{size: 3})
+    {:ok, board} = Board.resign board, :black
+    assert board.is_over
+    assert board.winner == :white
+  end
+  
+  test "cannot add move after end of the game" do
+    board = Board.new(%{size: 3})
+    {:ok, board} = Board.pass board, :black
+    {:ok, board} = Board.pass board, :white
+    assert is_in_error?(Board.add_move board, {{1, 1}, :black})
+  end
+  
+  test "cannot pass after end of the game" do
+    board = Board.new(%{size: 3})
+    {:ok, board} = Board.pass board, :black
+    {:ok, board} = Board.pass board, :white
+    assert is_in_error?(Board.pass board, :black)
+  end
+  
+  # Most functions returns are tuple of form {:ok, t} | {:error, reason}
+  # This helper help to check if a response is an error, 
+  # without caring about reason
+  defp is_in_error?(response) do
+    Tuple.to_list(response) |> List.first == :error
   end
 end
