@@ -1,6 +1,9 @@
 # Go
 
-**TODO: Add description**
+## Description
+This package contains logic to play the game of go. 
+Nothing related to the go language...
+It is [godash](https://github.com/duckpunch/godash) ported to elixir.
 
 ## Installation
 
