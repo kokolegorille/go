@@ -54,7 +54,7 @@ defmodule Go.Mixfile do
   defp package do
     # These are the default files included in the package
     [
-      name: :go,
+      name: :elixir_go,
       files: ["lib", "mix.exs", "README*"],
       maintainers: ["koko.le.gorille"],
       licenses: ["Apache 2.0"],
