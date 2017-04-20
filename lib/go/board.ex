@@ -65,10 +65,10 @@ defmodule Go.Board do
   
   @doc ~S"""
   Add move to a board. 
-  
-  Note: do not use string, but String.t in spec!
-  https://hexdocs.pm/elixir/typespecs.html#notes
   """
+  
+  # Note: do not use string, but String.t in spec!
+  # https://hexdocs.pm/elixir/typespecs.html#notes
   @spec add_move(t, move) :: {:ok, t} | {:error, String.t}
   def add_move(board, {coordinate, color} = move) do
     legal_move = is_legal_move(board, move)
