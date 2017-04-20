@@ -7,6 +7,7 @@ defmodule Go.Mixfile do
      elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     description: description(),
      deps: deps(),
      
      # Docs
@@ -41,5 +42,11 @@ defmodule Go.Mixfile do
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
       {:ex_doc, "~> 0.14", only: :dev, runtime: false}
     ]
+  end
+  
+  defp description do
+    """
+    Elixir struct for playing the game of go. Ported from javascript/godash.
+    """
   end
 end
