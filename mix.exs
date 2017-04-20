@@ -8,6 +8,7 @@ defmodule Go.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      description: description(),
+     package: package(),
      deps: deps(),
      
      # Docs
@@ -48,5 +49,16 @@ defmodule Go.Mixfile do
     """
     Elixir struct for playing the game of go. Ported from javascript/godash.
     """
+  end
+  
+  defp package do
+    # These are the default files included in the package
+    [
+      name: :go,
+      files: ["lib", "priv", "mix.exs", "README*", "readme*", "LICENSE*", "license*"],
+      maintainers: ["koko.le.gorille"],
+      licenses: ["Apache 2.0"],
+      links: %{"GitHub" => "https://github.com/kokolegorille/go"}
+    ]
   end
 end
