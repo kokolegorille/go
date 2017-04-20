@@ -8,8 +8,7 @@ defmodule Go.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps(),
-   
-   
+     
      # Docs
      name: "Elixir Go",
      source_url: "https://github.com/kokolegorille/go",
