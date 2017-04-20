@@ -55,7 +55,7 @@ defmodule Go.Mixfile do
     # These are the default files included in the package
     [
       name: :go,
-      files: ["lib", "priv", "mix.exs", "README*", "readme*", "LICENSE*", "license*"],
+      files: ["lib", "mix.exs", "README*"],
       maintainers: ["koko.le.gorille"],
       licenses: ["Apache 2.0"],
       links: %{"GitHub" => "https://github.com/kokolegorille/go"}
