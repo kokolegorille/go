@@ -14,7 +14,7 @@ by adding `go` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:go, "~> 0.1.0"}]
+  [{:elixir_go, "~> 0.1.0"}]
 end
 ```
 
