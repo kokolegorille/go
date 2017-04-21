@@ -2,7 +2,7 @@ defmodule Go.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :go,
+    [app: :elixir_go,
      version: "0.1.0",
      elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
@@ -15,7 +15,7 @@ defmodule Go.Mixfile do
      name: "Elixir Go",
      source_url: "https://github.com/kokolegorille/go",
      homepage_url: "https://github.com/kokolegorille/go",
-     docs: [main: "Elixir Go", # The main page in the docs
+     docs: [main: "Go", # The main page in the docs
             #logo: "path/to/logo.png",
             extras: ["README.md"]]
    ]
