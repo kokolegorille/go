@@ -17,6 +17,7 @@ def deps do
 end
 ```
 
+The package can be found at [https://hex.pm/packages/elixir_go](https://hex.pm/packages/elixir_go).
 The docs can be found at [https://hexdocs.pm/elixir_go](https://hexdocs.pm/elixir_go).
 
 ## Usage
