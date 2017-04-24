@@ -10,7 +10,7 @@ checks also ko rule, and holds information about captures count.
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `go` to your list of dependencies in `mix.exs`:
+by adding `elixir_go` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -20,7 +20,7 @@ end
 
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/go](https://hexdocs.pm/go).
+be found at [https://hexdocs.pm/go](https://hexdocs.pm/elixir_go).
 
 ## Usage
 
