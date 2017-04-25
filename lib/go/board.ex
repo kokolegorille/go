@@ -432,8 +432,14 @@ defmodule Go.Board do
     komi: komi
     } = _board, actions) do
       
+    # %{
+    #   fengo: fengo(coordinates, next_turn),
+    #   actions: actions,
+    #   count_info: %{black_captures: black_captures, white_captures: white_captures, komi: komi}
+    # }
+    
     %{
-      fengo: fengo(coordinates, next_turn),
+      fengo: Tools.to_fengo(coordinates, next_turn),
       actions: actions,
       count_info: %{black_captures: black_captures, white_captures: white_captures, komi: komi}
     }
@@ -465,18 +471,19 @@ defmodule Go.Board do
   #
   # which should be unique in the history key
   defp is_superko(coordinates, next_turn, lookup_table) do
-    lookup = fengo(coordinates, next_turn)
+    # lookup = fengo(coordinates, next_turn)
+    lookup = Tools.to_fengo(coordinates, next_turn)
 
     # Does the lookup key already exists in history?
     Enum.member?(lookup_table, lookup)
   end
   
   # Returns a string of next_turn and string_coordinates
-  defp fengo(coordinates, next_turn) do 
-    color_symbol = next_turn 
-    |> to_string 
-    |> String.first 
-    |> String.upcase
-    "#{color_symbol} #{Tools.coordinates_to_string(coordinates)}"
-  end
+  # defp fengo(coordinates, next_turn) do
+  #   color_symbol = next_turn
+  #   |> to_string
+  #   |> String.first
+  #   |> String.upcase
+  #   "#{color_symbol} #{Tools.coordinates_to_string(coordinates)}"
+  # end
 end

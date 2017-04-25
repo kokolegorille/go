@@ -22,18 +22,58 @@ defmodule Go.Board.Tools do
   end
   
   def string_to_coordinates(string) do
+    size = string |> String.length |> :math.sqrt |> round
     string 
     |> decode
     |> String.split("")
     |> List.delete_at(-1)
     |> Enum.with_index 
     |> Enum.reduce(%{}, fn({item, index} = _tuple, acc) -> 
-      x = (index / 19) |> Float.floor |> round
-      y = rem(index, 19)
+      x = (index / size) |> Float.floor |> round
+      y = rem(index, size)
       Map.put(acc, {x, y}, text_to_symbol(item))
     end)
   end
-
+  
+  ### NEW
+  def to_fengo(coordinates, next_turn) do 
+    "#{next_turn_to_symbol(next_turn)} #{coordinates_to_string(coordinates)}"
+  end
+  
+  # any_to_fengo cannot work without next_turn info
+  def fengo_to_string(string) do
+    string 
+    |> String.slice(2, String.length(string))
+    |> decode
+  end
+  
+  def fengo_to_ascii_board(string) do
+    string 
+    |> fengo_to_string
+    |> string_to_ascii_board
+  end
+  
+  def string_to_ascii_board(string) do
+    size = string |> String.length |> :math.sqrt |> round
+    string 
+    |> to_charlist 
+    |> Enum.chunk(size) 
+    |> Enum.join("\n")
+  end
+  
+  def ascii_board_to_string(string) do
+    string |> String.replace("\n", "")
+  end
+  
+  def next_turn_to_symbol(next_turn) do
+    next_turn 
+    |> to_string 
+    |> String.first 
+    |> String.upcase
+  end
+  
+  ### END NEW
+  
   def symbol_to_text(symbol) do
     case symbol do
       :black -> "O"
