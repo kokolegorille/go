@@ -38,7 +38,7 @@ defmodule Go.Board.Tools do
   # Transform coordinate to sgf move, vice-versa
   
   # "ab" => {x, y}
-  defp move_to_coordinate(move) do
+  def move_to_coordinate(move) do
     array_of_index = move
     |> to_charlist
     |> Enum.map(& &1 - 97)
@@ -46,7 +46,7 @@ defmodule Go.Board.Tools do
   end
   
   # {x, y} => "ab"
-  defp coordinate_to_move(coordinate) do
+  def coordinate_to_move(coordinate) do
     [elem(coordinate, 0) + 97, elem(coordinate, 1) + 97]
     |> to_string
   end
