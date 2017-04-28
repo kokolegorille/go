@@ -289,6 +289,34 @@ defmodule GoBoardTest do
     assert is_in_error?(Board.add_move(board, {{4, 3}, :black}))
   end
   
+  # Describe history
+  test "store history" do
+    board = Board.new
+    {:ok, board} = Board.add_move board, {{2, 3}, :black}
+    {:ok, board} = Board.add_move board, {{4, 2}, :white}
+    
+    assert board.history |> Enum.count === 2
+  end
+  
+  # Describe moves
+  test "store moves" do
+    board = Board.new
+    {:ok, board} = Board.add_move board, {{2, 3}, :black}
+    {:ok, board} = Board.add_move board, {{4, 2}, :white}
+    
+    assert board.moves |> Enum.count === 2
+  end
+  
+  test "store moves with placements" do
+    board = Board.new
+    {:ok, board} = Board.place_stones board, [{1, 1}, {1, 2}, {1, 3}], :black
+    {:ok, board} = Board.place_stones board, [{2, 1}, {2, 2}, {2, 3}], :white
+    assert (board.moves) |> Enum.count === 0
+    
+    {:ok, board} = Board.add_move board, {{3, 3}, :black}
+    assert board.moves |> List.first |> Enum.count === 7
+  end
+  
   # Describe To Ascii Board
   
   test "can produce a simple empty board" do

@@ -35,7 +35,22 @@ defmodule Go.Board.Tools do
     end)
   end
   
-  ### NEW
+  # Transform coordinate to sgf move, vice-versa
+  
+  # "ab" => {x, y}
+  defp move_to_coordinate(move) do
+    array_of_index = move
+    |> to_charlist
+    |> Enum.map(& &1 - 97)
+    {Enum.at(array_of_index, 0), Enum.at(array_of_index, 1)}
+  end
+  
+  # {x, y} => "ab"
+  defp coordinate_to_move(coordinate) do
+    [elem(coordinate, 0) + 97, elem(coordinate, 1) + 97]
+    |> to_string
+  end
+  
   def to_fengo(coordinates, next_turn) do 
     "#{next_turn_to_symbol(next_turn)} #{coordinates_to_string(coordinates)}"
   end

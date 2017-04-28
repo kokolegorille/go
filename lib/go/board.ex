@@ -18,13 +18,11 @@ defmodule Go.Board do
   @type color :: :black | :white | :empty
   @type move :: {coordinate, color}
   
-  @typedoc """
-  Represents the state for a game of go.
-  """
   @type t :: %Board{ 
     size: integer, coordinates: map, next_turn: color, 
     black_captures: integer, white_captures: integer, komi: float,
     history: list,
+    moves: list,
     placements: list,
     consecutive_passes: integer,
     is_over: boolean,
@@ -35,6 +33,7 @@ defmodule Go.Board do
     size: 19, coordinates: %{}, next_turn: :black,
     black_captures: 0, white_captures: 0, komi: 7.5,
     history: [],
+    moves: [],
     placements: [],
     consecutive_passes: 0,
     is_over: false,
@@ -66,10 +65,6 @@ defmodule Go.Board do
   @doc ~S"""
   Add move to a board. 
   """
-  
-  # Note: do not use string, but String.t in spec!
-  # https://hexdocs.pm/elixir/typespecs.html#notes
-  @spec add_move(t, move) :: {:ok, t} | {:error, String.t}
   def add_move(board, {coordinate, color} = move) do
     legal_move = is_legal_move(board, move)
     
@@ -98,18 +93,25 @@ defmodule Go.Board do
         |> Enum.reduce(new_coordinates, fn(c, acc) -> Map.put(acc, c, :empty) end)
         
         # Checking for superko needs to keep track of history
-        lookup_table = board.history |> Enum.map(fn h -> h.fengo end)
-        if is_superko(new_coordinates, opposite_color(board.next_turn), lookup_table) do
+        lookup = Tools.to_fengo(new_coordinates, opposite_color(board.next_turn))
+        
+        # if is_superko(new_coordinates, opposite_color(board.next_turn), lookup_table) do
+        if Enum.member?(board.history, lookup) do
           {:error, "superko."}
         else
           # Add to history
-          history_item = build_history_item(board, [{:add_move, move} | board.placements])
-          new_history = [history_item | board.history]
+          history_item = build_history_item(board.coordinates, board.next_turn)
+          new_history = [history_item | board.history]          
+          
+          # Add to moves
+          move_item = [{:add_move, move} | board.placements]
+          new_moves = [move_item | board.moves]
           
           new_board = %Board{Map.merge(board, captures) | 
             coordinates: new_coordinates,
             next_turn: opposite_color(board.next_turn),
             history: new_history,
+            moves: new_moves,
             placements: [], 
             consecutive_passes: 0
           }
@@ -127,8 +129,13 @@ defmodule Go.Board do
       board.is_over -> {:error, "game is over."}
       color == board.next_turn -> 
         # Add to history
-        history_item = build_history_item(board, [{:pass, color} | board.placements])
+        history_item = build_history_item(board.coordinates, board.next_turn)
         new_history = [history_item | board.history]
+        
+        
+        # Add to move
+        move_item = [{:pass, color} | board.placements]
+        new_moves = [move_item | board.moves]
         
         consecutive_passes = board.consecutive_passes + 1
         is_over = consecutive_passes >= 2
@@ -139,6 +146,7 @@ defmodule Go.Board do
           next_turn: opposite_color(board.next_turn),
           history: new_history,
           placements: [],
+          moves: new_moves,
           consecutive_passes: consecutive_passes,
           is_over: is_over
         }
@@ -424,25 +432,23 @@ defmodule Go.Board do
   end
   
   # Save history informations for each turn (add_move, pass)
-  defp build_history_item(%{
-    coordinates: coordinates, 
-    next_turn: next_turn,
-    black_captures: black_captures, 
-    white_captures: white_captures, 
-    komi: komi
-    } = _board, actions) do
-      
-    # %{
-    #   fengo: fengo(coordinates, next_turn),
-    #   actions: actions,
-    #   count_info: %{black_captures: black_captures, white_captures: white_captures, komi: komi}
-    # }
-    
-    %{
-      fengo: Tools.to_fengo(coordinates, next_turn),
-      actions: actions,
-      count_info: %{black_captures: black_captures, white_captures: white_captures, komi: komi}
-    }
+  # defp build_history_item(%{
+  #   coordinates: coordinates,
+  #   next_turn: next_turn,
+  #   black_captures: black_captures,
+  #   white_captures: white_captures,
+  #   komi: komi
+  #   } = _board, actions) do
+  #
+  #   %{
+  #     fengo: Tools.to_fengo(coordinates, next_turn),
+  #     actions: actions,
+  #     count_info: %{black_captures: black_captures, white_captures: white_captures, komi: komi}
+  #   }
+  # end
+  
+  defp build_history_item(coordinates, next_turn) do
+    Tools.to_fengo(coordinates, next_turn)
   end
   
   # Keep track of captured stones for black and white
@@ -470,20 +476,10 @@ defmodule Go.Board do
   # A RLE encoded string representation of the coordinates
   #
   # which should be unique in the history key
-  defp is_superko(coordinates, next_turn, lookup_table) do
-    # lookup = fengo(coordinates, next_turn)
-    lookup = Tools.to_fengo(coordinates, next_turn)
-
-    # Does the lookup key already exists in history?
-    Enum.member?(lookup_table, lookup)
-  end
-  
-  # Returns a string of next_turn and string_coordinates
-  # defp fengo(coordinates, next_turn) do
-  #   color_symbol = next_turn
-  #   |> to_string
-  #   |> String.first
-  #   |> String.upcase
-  #   "#{color_symbol} #{Tools.coordinates_to_string(coordinates)}"
+  # defp is_superko(coordinates, next_turn, lookup_table) do
+  #   lookup = Tools.to_fengo(coordinates, next_turn)
+  #
+  #   # Does the lookup key already exists in history?
+  #   Enum.member?(lookup_table, lookup)
   # end
 end
