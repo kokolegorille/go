@@ -95,7 +95,8 @@ defmodule Go.Board do
         # Checking for superko needs to keep track of history
         lookup = Tools.to_fengo(new_coordinates, opposite_color(board.next_turn))
         
-        # if is_superko(new_coordinates, opposite_color(board.next_turn), lookup_table) do
+        # Check if the position does not repeat!
+        # http://senseis.xmp.net/?Superko
         if Enum.member?(board.history, lookup) do
           {:error, "superko."}
         else
@@ -431,22 +432,7 @@ defmodule Go.Board do
     |> Enum.into([])
   end
   
-  # Save history informations for each turn (add_move, pass)
-  # defp build_history_item(%{
-  #   coordinates: coordinates,
-  #   next_turn: next_turn,
-  #   black_captures: black_captures,
-  #   white_captures: white_captures,
-  #   komi: komi
-  #   } = _board, actions) do
-  #
-  #   %{
-  #     fengo: Tools.to_fengo(coordinates, next_turn),
-  #     actions: actions,
-  #     count_info: %{black_captures: black_captures, white_captures: white_captures, komi: komi}
-  #   }
-  # end
-  
+  # Save history fengo informations for each turn  
   defp build_history_item(coordinates, next_turn) do
     Tools.to_fengo(coordinates, next_turn)
   end
@@ -466,20 +452,4 @@ defmodule Go.Board do
         %{}
     end
   end
-  
-  # Check if the position does not repeat!
-  # http://senseis.xmp.net/?Superko
-  #
-  # From coordinates, next_turn we build a string which contains :
-  #
-  # next_turn |> String.first |> String.upcase <> 
-  # A RLE encoded string representation of the coordinates
-  #
-  # which should be unique in the history key
-  # defp is_superko(coordinates, next_turn, lookup_table) do
-  #   lookup = Tools.to_fengo(coordinates, next_turn)
-  #
-  #   # Does the lookup key already exists in history?
-  #   Enum.member?(lookup_table, lookup)
-  # end
 end
