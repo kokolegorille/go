@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.2.0
+
+THIS VERSION ADD NEW ENTITIES!
+
+1. Add new entities and corresponding tests
+  * Game
+  * Turn
+  * Coordinate
+  * (Board)
+
+2. Remove some board responsabilities (moved to game)
+
+Game is now the main entity. It contains a current board, count_info and a turn history (turns)  
+Turn contains a fengo string, the current move, additional actions (eg: stone placements)
+Board is now simplified, it stores size, coordinates and next_turn
+(size can also be deduced from coordinates size!)
+
 ## 0.1.2
 
 THIS VERSION CHANGE STRUCTURE! 

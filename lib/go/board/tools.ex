@@ -1,16 +1,11 @@
 # Shared Tools for BOARD
 
-# TESTING coordinates to string and reverse!
-#
-# str = "43+1X16+1X11+1X24+1O171+1O25+1O3+1X1+1O5+1O53+"
-# c = Tools.string_to_coordinates str
-# c == Tools.coordinates_to_string(c) |> Tools.string_to_coordinates
-# str == Tools.string_to_coordinates(str) |> Tools.coordinates_to_string
-
 defmodule Go.Board.Tools do
+  alias Go.Board
+  
   # Transform coordinates (Map) to encoded string
   def coordinates_to_string(coordinates) do
-    size = coordinates |> Enum.count |> :math.sqrt |> round
+    size = size_from_coordinates(coordinates)
     range = 0..(size - 1)
     for x <- range do
       for y <- range do
@@ -22,9 +17,9 @@ defmodule Go.Board.Tools do
   end
   
   def string_to_coordinates(string) do
-    size = string |> String.length |> :math.sqrt |> round
-    string 
-    |> decode
+    decoded_string = string |> decode
+    size = size_from_string(decoded_string)    
+    decoded_string
     |> String.split("")
     |> List.delete_at(-1)
     |> Enum.with_index 
@@ -51,8 +46,23 @@ defmodule Go.Board.Tools do
     |> to_string
   end
   
+  def to_fengo(board) do
+    to_fengo(board.coordinates, board.next_turn)
+  end
+  
   def to_fengo(coordinates, next_turn) do 
-    "#{next_turn_to_symbol(next_turn)} #{coordinates_to_string(coordinates)}"
+    "#{next_turn_to_string(next_turn)} #{coordinates_to_string(coordinates)}"
+  end
+  
+  def from_fengo(fengo) do
+    [string_next_turn, _string_coordinates] = fengo |> String.split
+    
+    coordinates = fengo |> string_to_coordinates
+
+    size = size_from_coordinates(coordinates)
+    next_turn = next_turn_from_string(string_next_turn)
+    
+    Board.new(%{size: size, coordinates: coordinates, next_turn: next_turn})
   end
   
   # any_to_fengo cannot work without next_turn info
@@ -69,7 +79,7 @@ defmodule Go.Board.Tools do
   end
   
   def string_to_ascii_board(string) do
-    size = string |> String.length |> :math.sqrt |> round
+    size = size_from_string(string)
     string 
     |> to_charlist 
     |> Enum.chunk(size) 
@@ -80,11 +90,19 @@ defmodule Go.Board.Tools do
     string |> String.replace("\n", "")
   end
   
-  def next_turn_to_symbol(next_turn) do
+  def next_turn_to_string(next_turn) do
     next_turn 
     |> to_string 
     |> String.first 
     |> String.upcase
+  end
+  
+  def next_turn_from_string(string) do
+    case string do
+      "W" -> :white
+      "B" -> :black
+      _ -> {:error, "should be W or B"}
+    end
   end
   
   ### END NEW
@@ -114,7 +132,7 @@ defmodule Go.Board.Tools do
   end
   
   def coordinates_to_ascii_board(coordinates) do
-    size = coordinates |> Enum.count |> :math.sqrt |> round
+    size = size_from_coordinates(coordinates)
     range = 0..(size - 1)
     
     for x <- range do
@@ -126,7 +144,7 @@ defmodule Go.Board.Tools do
   end
   
   def coordinates_to_game_format(coordinates, next_turn) do
-    size = coordinates |> Enum.count |> :math.sqrt |> round
+    size = size_from_coordinates(coordinates)
     range = 0..(size - 1)
     
     header = 
@@ -162,4 +180,9 @@ player_to_move #{next_turn |> symbol_to_game_format}\n"
   def decode(list) when is_list(list) do
     to_string(list) |> decode |> to_char_list
   end
+  
+  # PRIVATE
+  defp size_from_coordinates(coordinates), do: coordinates |> Enum.count |> :math.sqrt |> round
+  
+  defp size_from_string(string), do: string |> String.length |> :math.sqrt |> round
 end

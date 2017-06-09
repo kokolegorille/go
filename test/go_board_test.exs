@@ -209,12 +209,13 @@ defmodule GoBoardTest do
     assert board.coordinates[{1, 2}] == :empty
   end
   
+  ##############################################################
+  
   # Describe Pass
   
   test "pass" do
     {:ok, board} = Board.pass Board.new, :black
     assert board.next_turn == :white
-    assert Enum.count(board.history) == 1
   end
   
   # Describe Toggle Turn
@@ -222,7 +223,6 @@ defmodule GoBoardTest do
   test "toggle_turn" do
     {:ok, board} = Board.toggle_turn Board.new
     assert board.next_turn == :white
-    assert Enum.count(board.history) == 0
   end
   
   # Describe Placements
@@ -267,58 +267,13 @@ defmodule GoBoardTest do
   end
   
   # Describe Place Stones
-    
   test "can place a bunch of stones" do
     coordinates = [{2, 1}, {2, 3}, {1, 2}, {3, 2}]
     {:ok, board} = Board.place_stones Board.new, coordinates, :black
     assert Enum.map(coordinates, fn (c) -> board.coordinates[c] end) == [:black, :black, :black, :black]
   end
   
-  # Describe Superko
-  
-  test "superko rule" do
-    board = Board.new
-    {:ok, board} = Board.add_move board, {{2, 3}, :black}
-    {:ok, board} = Board.add_move board, {{4, 2}, :white}
-    {:ok, board} = Board.add_move board, {{3, 2}, :black}
-    {:ok, board} = Board.add_move board, {{5,3}, :white}
-    {:ok, board} = Board.add_move board, {{3, 4}, :black}
-    {:ok, board} = Board.add_move board, {{4,4}, :white}
-    {:ok, board} = Board.add_move board, {{4, 3}, :black}
-    {:ok, board} = Board.add_move board, {{3, 3}, :white}
-    assert is_in_error?(Board.add_move(board, {{4, 3}, :black}))
-  end
-  
-  # Describe history
-  test "store history" do
-    board = Board.new
-    {:ok, board} = Board.add_move board, {{2, 3}, :black}
-    {:ok, board} = Board.add_move board, {{4, 2}, :white}
-    
-    assert board.history |> Enum.count === 2
-  end
-  
-  # Describe moves
-  test "store moves" do
-    board = Board.new
-    {:ok, board} = Board.add_move board, {{2, 3}, :black}
-    {:ok, board} = Board.add_move board, {{4, 2}, :white}
-    
-    assert board.moves |> Enum.count === 2
-  end
-  
-  test "store moves with placements" do
-    board = Board.new
-    {:ok, board} = Board.place_stones board, [{1, 1}, {1, 2}, {1, 3}], :black
-    {:ok, board} = Board.place_stones board, [{2, 1}, {2, 2}, {2, 3}], :white
-    assert (board.moves) |> Enum.count === 0
-    
-    {:ok, board} = Board.add_move board, {{3, 3}, :black}
-    assert board.moves |> List.first |> Enum.count === 7
-  end
-  
-  # Describe To Ascii Board
-  
+  # Describe To Ascii Board  
   test "can produce a simple empty board" do
     board = Board.new(%{size: 3})
     assert Board.to_ascii_board(board) == "+++\n+++\n+++\n"
@@ -328,50 +283,6 @@ defmodule GoBoardTest do
     board = Board.new(%{size: 3})
     {:ok, board} = Board.add_move board, {{1, 1}, :black}
     assert Board.to_ascii_board(board) == "+++\n+O+\n+++\n"
-  end
-  
-  # Describe Game Over
-  
-  test "new board is not over" do
-    board = Board.new()
-    assert ! board.is_over
-  end
-  
-  test "double pass end the game" do
-    board = Board.new(%{size: 3})
-    {:ok, board} = Board.pass board, :black
-    {:ok, board} = Board.pass board, :white
-    assert board.is_over
-  end
-  
-  test "adding a move reset passes counter" do
-    board = Board.new(%{size: 3})
-    {:ok, board} = Board.pass board, :black
-    {:ok, board} = Board.add_move board, {{1, 1}, :white}
-    {:ok, board} = Board.pass board, :black
-    assert ! board.is_over
-    assert board.consecutive_passes == 1
-  end
-  
-  test "resign end the game" do
-    board = Board.new(%{size: 3})
-    {:ok, board} = Board.resign board, :black
-    assert board.is_over
-    assert board.winner == :white
-  end
-  
-  test "cannot add move after end of the game" do
-    board = Board.new(%{size: 3})
-    {:ok, board} = Board.pass board, :black
-    {:ok, board} = Board.pass board, :white
-    assert is_in_error?(Board.add_move board, {{1, 1}, :black})
-  end
-  
-  test "cannot pass after end of the game" do
-    board = Board.new(%{size: 3})
-    {:ok, board} = Board.pass board, :black
-    {:ok, board} = Board.pass board, :white
-    assert is_in_error?(Board.pass board, :black)
   end
   
   test "reset the game" do
