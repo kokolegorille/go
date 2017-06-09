@@ -27,7 +27,7 @@ See tests for sample usage.
 ```elixir
 iex> alias Go.{Game, Board}
 iex> game = Game.new(%{size: 9})
-iex> {:ok, game} = Game.add_move(board, {{2, 2}, :black})
+iex> {:ok, game} = Game.add_move(game, {{2, 2}, :black})
 iex> {:ok, game} = Game.add_move(game, {{3, 3}, :white})
 iex> game.current_board |> Board.to_ascii_board |> IO.puts 
 +++++++++
