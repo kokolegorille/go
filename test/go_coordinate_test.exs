@@ -24,10 +24,11 @@ defmodule GoCoordinateTest do
     assert coordinate === {3, 3}
   end
   
-  # test "yield coordinates from a valid list of tuples" do
-  #   coordinates = Coordinate.list_from_tuples([{3, 3}, {4, 4}])
-  #   assert
-  # end
+  test "yield coordinates from a valid list of tuples" do
+    tuples = [{3, 3}, {4, 4}]
+    coordinates = Coordinate.list_from_tuples(tuples)
+    assert coordinates |> Coordinate.list_to_tuples === tuples
+  end
   
   test "yield tuples from a valid list of coordinates" do
     coordinates = Coordinate.list_from_tuples([{3, 3}, {4, 4}]) |> Coordinate.list_to_tuples
