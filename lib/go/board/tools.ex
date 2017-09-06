@@ -166,11 +166,11 @@ player_to_move #{next_turn |> symbol_to_game_format}\n"
   # Run Length Encoder for Elixir
   # https://www.rosettacode.org/wiki/Run-length_encoding#Elixir
   def encode(str) when is_bitstring(str) do
-    to_char_list(str) |> encode |> to_string
+    to_charlist(str) |> encode |> to_string
   end
   def encode(list) when is_list(list) do
     Enum.chunk_by(list, &(&1))
-    |> Enum.flat_map(fn chars -> to_char_list(length(chars)) ++ [hd(chars)] end)
+    |> Enum.flat_map(fn chars -> to_charlist(length(chars)) ++ [hd(chars)] end)
   end
  
   def decode(str) when is_bitstring(str) do
@@ -178,7 +178,7 @@ player_to_move #{next_turn |> symbol_to_game_format}\n"
     |> Enum.map_join(fn [_,n,c] -> String.duplicate(c, String.to_integer(n)) end)
   end
   def decode(list) when is_list(list) do
-    to_string(list) |> decode |> to_char_list
+    to_string(list) |> decode |> to_charlist
   end
   
   # PRIVATE
