@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.3.0
+
+Update for Elixir 1.6
+
+* ex_doc 0.18.3
+* dialyxir 0.5.1
+
+Add 
+
+* credo 0.8.10
+
+Fix credo linting error
+Fix test
+
+Add display module
+Add display test
+Move Board to_array, to_list -> Go.Display
+Rename to_array -> to_list
+
 ## 0.2.0
 
 THIS VERSION ADD NEW ENTITIES!

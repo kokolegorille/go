@@ -1,7 +1,6 @@
 defmodule GoGameTest do
   use ExUnit.Case
   alias Go.Game
-  alias Go.Board
   
   doctest Game
   
@@ -23,8 +22,9 @@ defmodule GoGameTest do
   test "update current_board when add a valid move" do
     game = Game.new(%{size: 9})
     {:ok, game} = game |> Game.add_move({{3, 3}, :black})
-    assert game.current_board |> Board.to_ascii_board === 
-      "+++++++++\n+++++++++\n+++++++++\n+++O+++++\n+++++++++\n+++++++++\n+++++++++\n+++++++++\n+++++++++\n"
+    
+    board = game.current_board
+    assert Map.get(board.coordinates, {3, 3}) == :black
   end
   
   # Describe Pass
@@ -46,8 +46,10 @@ defmodule GoGameTest do
     {:ok, game} = Game.add_move game, {{2, 3}, :black}
     {:ok, game} = Game.remove_stones game, [{1, 1}, {1, 2}]
     {:ok, game} = Game.add_move game, {{1, 1}, :white}
-    assert Board.to_ascii_board(game.current_board) |> String.slice(0, 60) ==
-      "+++++++++++++++++++\n+X+O+++++++++++++++\n+++O+++++++++++++++\n"
+    
+    board = game.current_board
+    assert Map.get(board.coordinates, {1, 1}) == :white
+    assert Map.get(board.coordinates, {1, 2}) == :empty
   end
 
   # Describe Place Stone

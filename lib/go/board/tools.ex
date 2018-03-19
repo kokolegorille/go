@@ -1,6 +1,6 @@
-# Shared Tools for BOARD
-
 defmodule Go.Board.Tools do
+  @moduledoc false
+  
   alias Go.Board
   
   # Transform coordinates (Map) to encoded string
@@ -21,10 +21,13 @@ defmodule Go.Board.Tools do
     size = size_from_string(decoded_string)    
     decoded_string
     |> String.split("")
-    |> List.delete_at(-1)
+    |> Enum.reject(& &1 == "")  # Remove first and last elements
     |> Enum.with_index 
     |> Enum.reduce(%{}, fn({item, index} = _tuple, acc) -> 
-      x = (index / size) |> Float.floor |> round
+      ratio = index / size
+      x = ratio 
+        |> Float.floor 
+        |> round
       y = rem(index, size)
       Map.put(acc, {x, y}, text_to_symbol(item))
     end)
@@ -166,19 +169,27 @@ player_to_move #{next_turn |> symbol_to_game_format}\n"
   # Run Length Encoder for Elixir
   # https://www.rosettacode.org/wiki/Run-length_encoding#Elixir
   def encode(str) when is_bitstring(str) do
-    to_charlist(str) |> encode |> to_string
+    str
+    |> to_charlist()
+    |> encode()
+    |> to_string()
   end
   def encode(list) when is_list(list) do
-    Enum.chunk_by(list, &(&1))
+    list
+    |> Enum.chunk_by(&(&1))
     |> Enum.flat_map(fn chars -> to_charlist(length(chars)) ++ [hd(chars)] end)
   end
  
   def decode(str) when is_bitstring(str) do
-    Regex.scan(~r/(\d+)(.)/, str)
-    |> Enum.map_join(fn [_,n,c] -> String.duplicate(c, String.to_integer(n)) end)
+    ~r/(\d+)(.)/
+    |> Regex.scan(str)
+    |> Enum.map_join(fn [_, n, c] -> String.duplicate(c, String.to_integer(n)) end)
   end
   def decode(list) when is_list(list) do
-    to_string(list) |> decode |> to_charlist
+    list 
+    |> to_string()
+    |> decode()
+    |> to_charlist()
   end
   
   # PRIVATE

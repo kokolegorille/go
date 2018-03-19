@@ -233,8 +233,9 @@ defmodule GoBoardTest do
     {:ok, board} = Board.add_move board, {{2, 3}, :black}
     {:ok, board} = Board.remove_stones board, [{1, 1}, {1, 2}]
     {:ok, board} = Board.add_move board, {{1, 1}, :white}
-    assert Board.to_ascii_board(board) |> String.slice(0, 60) == 
-      "+++++++++++++++++++\n+X+O+++++++++++++++\n+++O+++++++++++++++\n"
+    
+    assert Map.get(board.coordinates, {1, 1}) == :white
+    assert Map.get(board.coordinates, {1, 2}) == :empty
   end
   
   # Describe Place Stone
@@ -271,18 +272,6 @@ defmodule GoBoardTest do
     coordinates = [{2, 1}, {2, 3}, {1, 2}, {3, 2}]
     {:ok, board} = Board.place_stones Board.new, coordinates, :black
     assert Enum.map(coordinates, fn (c) -> board.coordinates[c] end) == [:black, :black, :black, :black]
-  end
-  
-  # Describe To Ascii Board  
-  test "can produce a simple empty board" do
-    board = Board.new(%{size: 3})
-    assert Board.to_ascii_board(board) == "+++\n+++\n+++\n"
-  end
-  
-  test "can produce a board with one move" do
-    board = Board.new(%{size: 3})
-    {:ok, board} = Board.add_move board, {{1, 1}, :black}
-    assert Board.to_ascii_board(board) == "+++\n+O+\n+++\n"
   end
   
   test "reset the game" do

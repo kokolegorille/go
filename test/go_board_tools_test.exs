@@ -13,7 +13,9 @@ defmodule GoBoardToolsTest do
   
   test "yield from string" do
     string = "30+1O50+"
-    assert string |> Tools.string_to_coordinates |> Tools.coordinates_to_string === string
+    assert string 
+    |> Tools.string_to_coordinates 
+    |> Tools.coordinates_to_string === string
   end
   
   test "yield from complex string" do
@@ -28,7 +30,8 @@ defmodule GoBoardToolsTest do
   
   test "yield to fengo" do
     {:ok, board} = Board.add_move Board.new(%{size: 9}), {{3, 3}, :black}
-    assert board |> Tools.to_fengo === "W 30+1O50+"
+    assert board 
+    |> Tools.to_fengo === "W 30+1O50+"
   end
 
   test "yield from fengo" do

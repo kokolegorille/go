@@ -14,7 +14,7 @@ defmodule Go.Game do
   
   ## Examples
   
-      iex> alias Go.{Game, Board} 
+      iex> alias Go.Game
       iex> game = Game.new
       iex> {:ok, game} = game |> Game.add_move({{3, 3}, :black})
       iex> {:ok, game} = game |> Game.add_move({{16, 3}, :white})
@@ -70,11 +70,20 @@ defmodule Go.Game do
   Returns a new Game structure from an optional map or struct.
   """  
   @spec new(nil | map) :: t
-  def new, do: new(%{})
+  def new(), do: new(%{})
   def new(%{__struct__: _} = initial_state), do: new(initial_state |> Map.from_struct)
-  def new(initial_state) do 
-    size          = initial_state[:size] || 19
-    current_board = initial_state[:current_board] || Board.new(%{size: size})
+  def new(initial_state) when is_list(initial_state) do 
+    if Keyword.keyword?(initial_state) do
+      initial_state
+      |> Enum.into(%{})
+      |> new
+    else
+      new(%{})
+    end    
+  end
+  def new(initial_state) when is_map(initial_state) do 
+    size = Map.get(initial_state, :size, 19)
+    current_board = Map.get(initial_state, :current_board, Board.new(%{size: size}))
     
     # build new state
     new_state = Map.merge(

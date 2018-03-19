@@ -10,8 +10,6 @@ defmodule Go.Board do
   """
 
   alias __MODULE__
-  require Go.Board.Tools
-  alias Go.Board.Tools
 
   @type coordinate :: {integer, integer}
   @type list_of_coordinates :: [coordinate]
@@ -80,14 +78,11 @@ defmodule Go.Board do
   """
   @spec pass(t, color) :: {:ok, t} | {:error, String.t}
   def pass(board, color) do
-    cond do
-      color == board.next_turn ->
-        new_board = %Board{board |
-          next_turn: opposite_color(board.next_turn)
-        }
-        {:ok, new_board}
-
-      true -> {:error, "not your turn."}
+    if color == board.next_turn do
+      new_board = %Board{board | next_turn: opposite_color(board.next_turn)}
+      {:ok, new_board}
+    else
+      {:error, "not your turn."}
     end
   end
 
@@ -194,7 +189,8 @@ defmodule Go.Board do
   """
   @spec matching_adjacent_coordinates(t, coordinate, color) :: list_of_coordinates
   def matching_adjacent_coordinates(board, coordinate, color) do
-    adjacent_coordinates(board, coordinate)
+    board
+    |> adjacent_coordinates(coordinate)
     |> Enum.filter(fn(c) -> board.coordinates[c] == color end)
   end
 
@@ -224,7 +220,8 @@ defmodule Go.Board do
   """
   @spec liberties(t, coordinate) :: list_of_coordinates
   def liberties(board, coordinate) do
-    group(board, coordinate)
+    board
+    |> group(coordinate)
     |> Enum.reduce([], fn (c, acc) ->
       list_union(matching_adjacent_coordinates(board, c, :empty), acc)
     end)
@@ -235,7 +232,9 @@ defmodule Go.Board do
   """
   @spec liberty_count(t, coordinate) :: integer
   def liberty_count(board, coordinate) do
-    liberties(board, coordinate) |> Enum.count
+    board 
+    |> liberties(coordinate) 
+    |> Enum.count
   end
 
   @doc ~S"""
@@ -244,7 +243,8 @@ defmodule Go.Board do
   """
   @spec killed_stones(t, coordinate, color) :: list_of_coordinates
   def killed_stones(board, coordinate, color) do
-    matching_adjacent_coordinates(board, coordinate, opposite_color(color))
+    board
+    |> matching_adjacent_coordinates(coordinate, opposite_color(color))
     |> Enum.filter(fn(c) -> liberty_count(board, c) == 1 end)
     |> Enum.map(fn(c) -> group(board, c) end)
     |> List.flatten
@@ -268,10 +268,12 @@ defmodule Go.Board do
 
     # Will be true if has liberties, or connect to a group with at least 2 libs!
     will_have_liberties = liberty_count(board, coordinate) > 0 ||
-      matching_adjacent_coordinates(board, coordinate, color)
+      board
+      |> matching_adjacent_coordinates(coordinate, color)
       |> Enum.any?(fn (c) -> liberty_count(board, c) > 1 end)
 
-    will_kill_something = matching_adjacent_coordinates(board, coordinate, opposite_color(color))
+    will_kill_something = board
+    |> matching_adjacent_coordinates(coordinate, opposite_color(color))
     |> Enum.any?(fn(c) -> liberty_count(board, c) == 1 end)
 
     is_not_occupied && (will_have_liberties || will_kill_something)
@@ -291,29 +293,6 @@ defmodule Go.Board do
   @spec is_legal_white_move(t, coordinate) :: boolean
   def is_legal_white_move(board, coordinate) do
     is_legal_move(board, {coordinate, :white})
-  end
-
-  @doc ~S"""
-  Generate an ascii board.
-  """
-  @spec to_ascii_board(t) :: binary
-  def to_ascii_board(board) do
-    Tools.coordinates_to_ascii_board(board.coordinates)
-  end
-
-  @doc ~S"""
-  Returns list from board.
-  """
-  @spec to_array(t) :: list
-  def to_array(board) do
-    range = 0..(board.size - 1)
-
-    for x <- range do
-      for y <- range do
-        symbol = board.coordinates |> Map.get({x, y})
-        Tools.symbol_to_text(symbol)
-      end
-    end
   end
 
   @doc ~S"""
@@ -344,7 +323,11 @@ defmodule Go.Board do
   # You transform to MapSet, and convert back to list
   # Set is deprecated in favor of MapSet!
   defp list_union(list1, list2) when is_list(list1) and is_list(list2) do
-    MapSet.union(Enum.into(list1, MapSet.new), Enum.into(list2, MapSet.new))
+    list1
+    |> mapset_from_list
+    |> MapSet.union(mapset_from_list(list2))
     |> Enum.into([])
   end
+  
+  defp mapset_from_list(list), do: Enum.into(list, MapSet.new)
 end
