@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1
+
+Fix config in hex.pm
+
 ## 0.3.0
 
 Update for Elixir 1.6

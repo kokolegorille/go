@@ -18,7 +18,6 @@ end
 ```
 
 [Available in Hex](https://hex.pm/packages/elixir_go).
-[Documentation](https://hexdocs.pm/elixir_go).
 
 ## Usage
 
