@@ -16,9 +16,9 @@ defmodule Go.Mixfile do
      name: "Go",
      source_url: "https://github.com/kokolegorille/go",
      homepage_url: "https://github.com/kokolegorille/go",
-     docs: [main: "Go", # The main page in the docs
-            #logo: "path/to/logo.png",
-            extras: ["README.md"]]
+     # docs: [main: "Go", # The main page in the docs
+     #        #logo: "path/to/logo.png",
+     #        extras: ["README.md"]]
    ]
   end
 
