@@ -17,4 +17,5 @@ defmodule Go do
   defdelegate toggle_turn(game), to: Game
   defdelegate to_ascii(game), to: Game
   defdelegate to_list(game), to: Game
+  defdelegate tally(game), to: Game
 end
