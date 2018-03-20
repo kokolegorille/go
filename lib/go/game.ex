@@ -298,6 +298,57 @@ defmodule Go.Game do
     {:ok, %Game{game | current_board: new_board}}
   end
   
+  # UTILITIES
+  
+  @doc ~S"""
+  Generate an ascii from current board game.
+  """
+  @spec to_ascii(Game.t) :: String.t
+  def to_ascii(game) do
+    board = game.current_board
+    Tools.coordinates_to_ascii_board(board.coordinates)
+  end
+  
+  @doc ~S"""
+  Returns list from current board game.
+  """
+  @spec to_list(Game.t) :: list
+  def to_list(game) do
+    board = game.current_board
+    range = 0..(board.size - 1)
+    for x <- range do
+      for y <- range do
+        symbol = board.coordinates |> Map.get({x, y})
+        Tools.symbol_to_text(symbol)
+      end
+    end
+  end
+  
+  @doc ~S"""
+  Returns the tally of the game
+  """
+  @spec tally(t) :: map()
+  def tally(%Game{is_over: true} = game) do
+    %{
+      game_state: :game_over,
+      move_number: length(game.turns),
+      next_turn: nil,
+      winner: game.winner,
+      board: to_ascii(game)
+    }
+  end
+  def tally(%Game{} = game) do
+    %{
+      game_state: :running,
+      move_number: length(game.turns),
+      next_turn: game.current_board.next_turn,
+      winner: game.winner,
+      board: to_ascii(game)
+    }
+  end
+  
+  # END OF UTILITIES
+  
   # PRIVATE
   defp opposite_color(color) do
     Board.opposite_color(color)

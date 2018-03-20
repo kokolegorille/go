@@ -1,7 +1,7 @@
 defmodule Go do
   @moduledoc false
   
-  alias Go.{Game, Display}
+  alias Go.Game
   
   def new_game(args \\ %{}), do: Go.Game.new(args)
   
@@ -15,7 +15,6 @@ defmodule Go do
   defdelegate reset(game), to: Game
   defdelegate resign(game, color), to: Game
   defdelegate toggle_turn(game), to: Game
-  
-  defdelegate to_ascii(game), to: Display
-  defdelegate to_list(game), to: Display
+  defdelegate to_ascii(game), to: Game
+  defdelegate to_list(game), to: Game
 end

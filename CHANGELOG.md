@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.2
+
+Add Go.TextClient
+
+Move to_ascii and to_list from Go.Display to Go.Game
+
+Remove Go.Display and associated tests
+
+Add tally to Go.Game
+
 ## 0.3.1
 
 Fix config in hex.pm

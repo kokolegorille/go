@@ -184,6 +184,46 @@ defmodule GoGameTest do
     assert initial_game == game
   end
   
+  # Describe To Ascii
+  test "can display to_ascii a simple game" do
+    game = Game.new(%{size: 3})
+    assert Game.to_ascii(game) == "+++\n+++\n+++\n"
+  end
+  
+  # Describe To List
+  test "can display to_list a simple game" do
+    game = Game.new(%{size: 3})
+    assert Game.to_list(game) == [
+      ["+", "+", "+"], 
+      ["+", "+", "+"], 
+      ["+", "+", "+"]
+    ]
+  end
+  
+  # Describe tally
+  test "can return a tally" do
+    game = Game.new(%{size: 3})
+    assert Game.tally(game) == %{
+      board: "+++\n+++\n+++\n",
+      game_state: :running,
+      move_number: 0,
+      next_turn: :black,
+      winner: :none
+    }
+  end
+  
+  test "can return a game_over tally" do
+    game = Game.new(%{size: 3})
+    {:ok, game} = Game.resign(game, :black)
+    assert Game.tally(game) == %{
+      board: "+++\n+++\n+++\n",
+      game_state: :game_over,
+      move_number: 0,
+      next_turn: nil,
+      winner: :white
+    }
+  end
+  
   # Most functions returns are tuple of form {:ok, t} | {:error, reason}
   # This helper help to check if a response is an error, 
   # without caring about reason
