@@ -105,9 +105,6 @@ It is now possible to import/export sgf files.
 
 ```elixir
 iex> filename = "test/fixtures/example.sgf"
-iex> {:ok, f} = File.read filename
-
-
-
-
+iex> {:ok, sgf} = File.read filename
+iex> {:ok, game} = Go.Game.from_sgf(sgf)
 ```
