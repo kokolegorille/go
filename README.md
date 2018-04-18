@@ -13,7 +13,7 @@ The package can be installed by adding `elixir_go` to your list of dependencies 
 
 ```elixir
 def deps do
-  [{:elixir_go, "~> 0.3.0"}]
+  [{:elixir_go, "~> 0.4.0"}]
 end
 ```
 

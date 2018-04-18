@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0
+
+Add sgf parser with leex.
+
+Add game import/export sgf file
+
 ## 0.3.2
 
 Add Go.TextClient

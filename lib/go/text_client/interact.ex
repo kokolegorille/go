@@ -1,7 +1,6 @@
 defmodule Go.TextClient.Interact do
   @moduledoc false
   
-  alias __MODULE__
   alias Go.Game
   alias Go.TextClient.{Player, State}
   

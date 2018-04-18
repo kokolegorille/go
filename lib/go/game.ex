@@ -10,7 +10,7 @@ defmodule Go.Game do
   
   It delegates rest of play to a current_board
   
-  June 2017, hf
+  June 2017-2018, hf
   
   ## Examples
   
@@ -29,11 +29,9 @@ defmodule Go.Game do
   """
   
   alias __MODULE__
-  alias Go.Board
+  alias Go.{Board, Turn, Coordinate, Parser}
   alias Go.Board.Tools
-  alias Go.Turn
-  alias Go.Coordinate
-  
+
   @type t :: %Game{
     size: integer,
     komi: float,
@@ -347,6 +345,47 @@ defmodule Go.Game do
     }
   end
   
+  @doc ~S"""
+  Imports a game from sgf, does not persists nodes, just moves from main branch!
+  and thus... does not save root node info
+  """
+  @spec from_sgf(String.t()) :: {:ok, t()} | {:error, term()}
+  def from_sgf(sgf) do
+    with {:ok, tree} <- Parser.parse(sgf),
+      branches <- 
+        tree
+        |> Parser.Tree.leaves() 
+        |> Enum.map(& Parser.Tree.ancestors_and_self(tree, &1.id)),
+      branch <- List.first(branches),
+      actions <- 
+        branch 
+        |> Enum.map(&Parser.Node.get_actions(&1)) 
+        |> Enum.reject(& &1 === [])
+    do
+      # gane or error!
+      actions
+      |> Enum.reduce({:ok, new()}, fn turn_actions, acc -> 
+        turn_actions 
+        |> Enum.reduce(acc, fn(action, acc2) -> 
+          apply_action(acc2, action)
+        end)
+      end)
+    end
+  end
+  
+  @doc ~S"""
+  Exports a game to sgf, just returns moves played, no properties, comments!
+  """
+  @spec to_sgf(t()) :: String.t()
+  def to_sgf(%Game{} = game) do
+    game.turns 
+    |> Enum.reverse
+    |> Enum.map(fn %Go.Turn{move: %{action: :add_move, payload: payload}} -> 
+      payload |> history_payload_to_sgf()
+    end)
+    |> to_string()
+  end
+  
   # END OF UTILITIES
   
   # PRIVATE
@@ -357,4 +396,30 @@ defmodule Go.Game do
   defp serialized_coordinate(coordinate) do
     coordinate |> Coordinate.from_tuple
   end
+  
+  def apply_action({:ok, game} = _state, action) do
+    case action do
+      {:pass, color} ->
+        game |> pass(color)
+      {:add_move, move} ->
+        game |> add_move(move)
+      {:place_stone, coordinate, color} ->
+        game |> place_stone(coordinate, color)
+      {:place_stones, list_of_coordinates, color} ->
+        game |> place_stones(list_of_coordinates, color)
+      {:remove_stone, coordinate} ->
+        game |> remove_stone(coordinate)
+      {:remove_stones, list_of_coordinates} ->
+        game |> remove_stones(list_of_coordinates)
+      {unknown_action, _} -> {:error, "unknown action #{unknown_action}"}
+      {unknown_action, _, _} -> {:error, "unknown action #{unknown_action}"}
+    end
+  end
+  
+  def apply_action({:error, reason} = _state, _action), do: {:error, reason}
+  
+  defp history_payload_to_sgf(%{color: :white, coordinate: %Coordinate{col: col, row: row}}), do:
+    ";W[#{Tools.coordinate_to_move({col, row})}]"
+  defp history_payload_to_sgf(%{color: :black, coordinate: %Coordinate{col: col, row: row}}), do:
+    ";B[#{Tools.coordinate_to_move({col, row})}]"
 end

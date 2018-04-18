@@ -93,9 +93,9 @@ defmodule GoGameTest do
     {:ok, game} = Game.add_move game, {{2, 3}, :black}
     {:ok, game} = Game.add_move game, {{4, 2}, :white}
     {:ok, game} = Game.add_move game, {{3, 2}, :black}
-    {:ok, game} = Game.add_move game, {{5,3}, :white}
+    {:ok, game} = Game.add_move game, {{5, 3}, :white}
     {:ok, game} = Game.add_move game, {{3, 4}, :black}
-    {:ok, game} = Game.add_move game, {{4,4}, :white}
+    {:ok, game} = Game.add_move game, {{4, 4}, :white}
     {:ok, game} = Game.add_move game, {{4, 3}, :black}
     {:ok, game} = Game.add_move game, {{3, 3}, :white}
     assert is_in_error?(Game.add_move(game, {{4, 3}, :black}))
@@ -222,6 +222,40 @@ defmodule GoGameTest do
       next_turn: nil,
       winner: :white
     }
+  end
+  
+  # Import/Export to sgf
+  test "can load game from sgf" do
+    filename = "./test/fixtures/example.sgf"
+    {:ok, file} = File.read(filename)
+    assert {:ok, game} = Game.from_sgf(file)
+    assert (length game.turns) > 10
+  end
+  
+  test "can dump game to sgf" do
+    filename = "./test/fixtures/example.sgf"
+    {:ok, file} = File.read(filename)
+    assert {:ok, game} = Game.from_sgf(file)
+    sgf = Game.to_sgf(game)
+    assert is_binary(sgf)
+    assert (String.length sgf) > 10
+  end
+  
+  test "can dump a new game to sgf" do
+    game = Game.new
+    {:ok, game} = Game.add_move game, {{2, 3}, :black}
+    {:ok, game} = Game.add_move game, {{4, 2}, :white}
+    {:ok, game} = Game.add_move game, {{3, 2}, :black}
+    {:ok, game} = Game.add_move game, {{5, 3}, :white}
+    {:ok, game} = Game.add_move game, {{3, 4}, :black}
+    {:ok, game} = Game.add_move game, {{4, 4}, :white}
+    {:ok, game} = Game.add_move game, {{4, 3}, :black}
+    {:ok, game} = Game.add_move game, {{3, 3}, :white}
+
+    sgf = Game.to_sgf(game)
+    assert is_binary(sgf)
+    assert (String.length sgf) > 10
+    assert sgf == ";B[dc];W[ce];B[cd];W[df];B[ed];W[ee];B[de];W[dd]"
   end
   
   # Most functions returns are tuple of form {:ok, t} | {:error, reason}

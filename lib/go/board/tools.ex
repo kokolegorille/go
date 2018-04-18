@@ -33,6 +33,18 @@ defmodule Go.Board.Tools do
     end)
   end
   
+  # Receive a charlist, eg.: '[ad]', or '[]'
+  # Returns a tuple {x, y}
+  def move_to_coordinates(move) when not is_binary(move) do
+    move_to_coordinates(move |> to_string)
+  end
+
+  def move_to_coordinates(move) do
+    move
+    |> sanitize_move()
+    |> Enum.map(&move_to_coordinate(&1))
+  end
+  
   # Transform coordinate to sgf move, vice-versa
   
   # "ab" => {x, y}
@@ -196,4 +208,11 @@ player_to_move #{next_turn |> symbol_to_game_format}\n"
   defp size_from_coordinates(coordinates), do: coordinates |> Enum.count |> :math.sqrt |> round
   
   defp size_from_string(string), do: string |> String.length |> :math.sqrt |> round
+  
+  defp sanitize_move(move) do
+    move
+    |> String.split("]")
+    |> Enum.map(fn(s) -> String.replace(s, "[", "") end)
+    |> Enum.reject(fn(m) -> m == "" end)
+  end
 end
