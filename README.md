@@ -100,3 +100,14 @@ game over, the winner is black
 ** (exit) normal
     (elixir_go) lib/go/text_client/player.ex:8: Go.TextClient.Player.play/1
 ```
+
+It is now possible to import/export sgf files.
+
+```elixir
+iex> filename = "test/fixtures/example.sgf"
+iex> {:ok, f} = File.read filename
+
+
+
+
+```

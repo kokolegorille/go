@@ -3,7 +3,7 @@ defmodule Go.Mixfile do
 
   def project do
     [app: :elixir_go,
-     version: "0.3.2",
+     version: "0.4.0",
      elixir: "~> 1.4",
      dialyzer: [plt_add_deps: :transitive],
      build_embedded: Mix.env == :prod,
