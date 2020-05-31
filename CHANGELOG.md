@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.1
+
+* Update mix.exs to include erlang src
+* Update to latest dev packages
+
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
+      {:ex_doc, "~> 0.22.1", only: :dev, runtime: false},
+      {:credo, "~> 1.4", only: [:dev], runtime: false},
+
+* Remove warning
+
+warning: Enum.chunk/2 is deprecated. Use Enum.chunk_every/2 instead
+  lib/go/board/tools.ex:100: Go.Board.Tools.string_to_ascii_board/1
+      
 ## 0.4.0
 
 Add sgf parser with leex.

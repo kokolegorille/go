@@ -3,7 +3,7 @@ defmodule Go.Mixfile do
 
   def project do
     [app: :elixir_go,
-     version: "0.4.0",
+     version: "0.4.1",
      elixir: "~> 1.4",
      dialyzer: [plt_add_deps: :transitive],
      build_embedded: Mix.env == :prod,
@@ -11,7 +11,8 @@ defmodule Go.Mixfile do
      description: description(),
      package: package(),
      deps: deps(),
-     
+     erlc_paths: ["src"],
+
      # Docs
      name: "Go",
      source_url: "https://github.com/kokolegorille/go",
@@ -41,18 +42,18 @@ defmodule Go.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:dialyxir, "~> 0.5.1", only: [:dev], runtime: false},
-      {:ex_doc, "~> 0.18.3", only: :dev, runtime: false},
-      {:credo, "~> 0.8.10", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
+      {:ex_doc, "~> 0.22.1", only: :dev, runtime: false},
+      {:credo, "~> 1.4", only: [:dev], runtime: false},
     ]
   end
-  
+
   defp description do
     """
     Elixir struct for playing the game of go. Ported from javascript/godash.
     """
   end
-  
+
   defp package do
     # These are the default files included in the package
     [
