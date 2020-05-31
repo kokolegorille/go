@@ -3,7 +3,7 @@ defmodule Go.Mixfile do
 
   def project do
     [app: :elixir_go,
-     version: "0.4.2",
+     version: "0.4.3",
      elixir: "~> 1.4",
      dialyzer: [plt_add_deps: :transitive],
      build_embedded: Mix.env == :prod,
@@ -58,7 +58,7 @@ defmodule Go.Mixfile do
     # These are the default files included in the package
     [
       name: :elixir_go,
-      files: ["lib", "mix.exs", "README*", "BUILD*","src"],
+      files: ["lib", "mix.exs", "README*", "src"],
       maintainers: ["koko.le.gorille"],
       licenses: ["Apache 2.0"],
       links: %{"GitHub" => "https://github.com/kokolegorille/go"}

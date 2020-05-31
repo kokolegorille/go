@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.3
+
+* Update mix.exs to correctly include erlang src code
+
 ## 0.4.2
 
 * Update mix.exs to correctly include erlang src code
